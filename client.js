@@ -13,10 +13,10 @@ const clientId = urlParams.get('id');
 if (clientId) {
     const client = getClientById(clientId);
     if (!client) {
-        window.location.href = 'index.html';
+        authError.textContent = 'Cliente non trovato!';
     }
 } else {
-    window.location.href = 'index.html';
+    authError.textContent = 'ID cliente non specificato!';
 }
 
 // Event Listener
