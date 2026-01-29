@@ -119,21 +119,6 @@ body {
     background: #7f8c8d;
 }
 
-.btn-warning {
-    padding: 10px 20px;
-    background: #ffc107;
-    color: #212529;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: transform 0.2s;
-}
-
-.btn-warning:hover {
-    transform: translateY(-2px);
-}
-
 .error-message {
     color: #e74c3c;
     margin-top: 15px;
@@ -233,12 +218,6 @@ body {
     color: #667eea;
     margin-bottom: 25px;
     font-size: 24px;
-}
-
-.card h3 {
-    color: #856404;
-    margin-bottom: 15px;
-    font-size: 18px;
 }
 
 .form-row {
