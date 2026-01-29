@@ -1,12 +1,16 @@
-// Credenziali amministratore - ATTENZIONE AI CARATTERI SPECIALI
-const ADMIN_USERNAME = 'G&LStudio';
-const ADMIN_PASSWORD = '12763Mlg@';
+// ============================================
+// CREDENZIALI DI ACCESSO - MODIFICA QUI
+// ============================================
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'admin123';
 
-// Stato login
+// ============================================
+// NON MODIFICARE IL CODICE SOTTO QUESTA LINEA
+// ============================================
+
 let isAdminLoggedIn = false;
 let editingClientId = null;
 
-// DOM Elements
 const loginSection = document.getElementById('loginSection');
 const dashboardSection = document.getElementById('dashboardSection');
 const loginForm = document.getElementById('loginForm');
@@ -21,68 +25,83 @@ const clientDetailModal = document.getElementById('clientDetailModal');
 // Event Listeners
 loginForm.addEventListener('submit', handleLogin);
 logoutBtn.addEventListener('click', handleLogout);
-clientForm.addEventListener('submit', handleAddClient);
+clientForm.addEventListener('submit', handleClientForm);
 backupBtn.addEventListener('click', createBackup);
 restoreBtn.addEventListener('click', openRestoreModal);
-
-// Aggiungi pulsante reset sessione
-addResetButton();
 
 // Carica dashboard se già loggato
 checkLoginStatus();
 
-// Funzioni Login
+// ============================================
+// FUNZIONI DI LOGIN
+// ============================================
+
 function handleLogin(e) {
     e.preventDefault();
     
-    // Rimuovi spazi prima/dopo le credenziali
     const username = document.getElementById('adminUsername').value.trim();
     const password = document.getElementById('adminPassword').value.trim();
     const loginError = document.getElementById('loginError');
     
-    console.log('Tentativo login:', { username, password });
-    console.log('Credenziali attese:', { ADMIN_USERNAME, ADMIN_PASSWORD });
+    console.log('=== TENTATIVO DI ACCESSO ===');
+    console.log('Username inserito:', JSON.stringify(username));
+    console.log('Password inserita:', JSON.stringify(password));
+    console.log('Username atteso:', JSON.stringify(ADMIN_USERNAME));
+    console.log('Password attesa:', JSON.stringify(ADMIN_PASSWORD));
     
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        console.log('✅ ACCESSO RIUSCITO!');
         isAdminLoggedIn = true;
-        saveLoginStatus();
+        localStorage.setItem('isAdminLoggedIn', 'true');
         showDashboard();
         loginError.textContent = '';
-        console.log('✅ Accesso riuscito!');
     } else {
-        // Debug dettagliato
-        let errors = [];
+        console.log('❌ ACCESSO FALLITO!');
+        let errorMsg = 'Credenziali errate!';
+        
         if (username !== ADMIN_USERNAME) {
-            errors.push(`Username errato (inserito: "${username}" - atteso: "${ADMIN_USERNAME}")`);
+            console.log('✗ Username errato');
+            errorMsg += ' Username non corretto.';
         }
+        
         if (password !== ADMIN_PASSWORD) {
-            errors.push(`Password errata (inserita: "${password.replace(/./g, '*')}" - attesa: "${ADMIN_PASSWORD.replace(/./g, '*')}")`);
+            console.log('✗ Password errata');
+            errorMsg += ' Password non corretta.';
         }
-        loginError.textContent = '❌ Credenziali errate! ' + errors.join(' | ');
-        console.error('❌ Accesso fallito:', errors);
+        
+        loginError.textContent = errorMsg;
     }
 }
 
 function handleLogout() {
     isAdminLoggedIn = false;
-    clearLoginStatus();
+    localStorage.removeItem('isAdminLoggedIn');
     showLogin();
 }
 
-// Funzioni Clienti
-function handleAddClient(e) {
+// ============================================
+// FUNZIONI DI GESTIONE CLIENTI
+// ============================================
+
+function handleClientForm(e) {
     e.preventDefault();
     
+    if (editingClientId) {
+        updateClient();
+    } else {
+        addClient();
+    }
+}
+
+function addClient() {
     const clientName = document.getElementById('clientName').value;
     const clientUsername = document.getElementById('clientUsername').value;
     const clientPassword = document.getElementById('clientPassword').value;
     const megaLink = document.getElementById('megaLink').value;
     const clientNotes = document.getElementById('clientNotes').value;
     
-    // Genera ID univoco
     const clientId = Date.now().toString(36) + Math.random().toString(36).substr(2);
     
-    // Crea oggetto cliente
     const newClient = {
         id: clientId,
         name: clientName,
@@ -93,62 +112,18 @@ function handleAddClient(e) {
         createdAt: new Date().toISOString()
     };
     
-    // Salva nel localStorage
-    saveClient(newClient);
+    let clients = getClients();
+    clients.push(newClient);
+    localStorage.setItem('galleryClients', JSON.stringify(clients));
     
-    // Reset form
     clientForm.reset();
     document.getElementById('clientNotes').value = '';
-    
-    // Aggiorna lista
     loadClients();
     
-    alert('Cliente aggiunto con successo!');
+    alert('✅ Cliente aggiunto con successo!');
 }
 
-function saveClient(client) {
-    let clients = getClients();
-    clients.push(client);
-    localStorage.setItem('galleryClients', JSON.stringify(clients));
-}
-
-function getClients() {
-    const clients = localStorage.getItem('galleryClients');
-    return clients ? JSON.parse(clients) : [];
-}
-
-function deleteClient(clientId) {
-    if (confirm('Sei sicuro di voler eliminare questo cliente? Questa azione non può essere annullata!')) {
-        let clients = getClients();
-        clients = clients.filter(client => client.id !== clientId);
-        localStorage.setItem('galleryClients', JSON.stringify(clients));
-        loadClients();
-    }
-}
-
-function editClient(clientId) {
-    editingClientId = clientId;
-    
-    const clients = getClients();
-    const client = clients.find(c => c.id === clientId);
-    
-    if (client) {
-        document.getElementById('clientName').value = client.name;
-        document.getElementById('clientUsername').value = client.username;
-        document.getElementById('clientPassword').value = client.password;
-        document.getElementById('megaLink').value = client.megaLink;
-        document.getElementById('clientNotes').value = client.notes || '';
-        
-        // Modifica il testo del pulsante
-        clientForm.querySelector('button[type="submit"]').textContent = 'Aggiorna Cliente';
-    }
-}
-
-function updateClient(e) {
-    e.preventDefault();
-    
-    if (!editingClientId) return;
-    
+function updateClient() {
     const clientName = document.getElementById('clientName').value;
     const clientUsername = document.getElementById('clientUsername').value;
     const clientPassword = document.getElementById('clientPassword').value;
@@ -171,17 +146,43 @@ function updateClient(e) {
         localStorage.setItem('galleryClients', JSON.stringify(clients));
         editingClientId = null;
         
-        // Ripristina il testo del pulsante
         clientForm.querySelector('button[type="submit"]').textContent = 'Aggiungi Cliente';
-        
-        // Reset form
         clientForm.reset();
         document.getElementById('clientNotes').value = '';
         
-        // Aggiorna lista
         loadClients();
+        alert('✅ Cliente aggiornato con successo!');
+    }
+}
+
+function getClients() {
+    const clients = localStorage.getItem('galleryClients');
+    return clients ? JSON.parse(clients) : [];
+}
+
+function deleteClient(clientId) {
+    if (confirm('⚠️ Sei sicuro di voler eliminare questo cliente?')) {
+        let clients = getClients();
+        clients = clients.filter(client => client.id !== clientId);
+        localStorage.setItem('galleryClients', JSON.stringify(clients));
+        loadClients();
+    }
+}
+
+function editClient(clientId) {
+    editingClientId = clientId;
+    
+    const clients = getClients();
+    const client = clients.find(c => c.id === clientId);
+    
+    if (client) {
+        document.getElementById('clientName').value = client.name;
+        document.getElementById('clientUsername').value = client.username;
+        document.getElementById('clientPassword').value = client.password;
+        document.getElementById('megaLink').value = client.megaLink;
+        document.getElementById('clientNotes').value = client.notes || '';
         
-        alert('Cliente aggiornato con successo!');
+        clientForm.querySelector('button[type="submit"]').textContent = 'Aggiorna Cliente';
     }
 }
 
@@ -250,12 +251,11 @@ function loadClients() {
     clientsList.innerHTML = '';
     
     if (clients.length === 0) {
-        clientsList.innerHTML = '<p class="no-clients">Nessun cliente ancora aggiunto.</p>';
+        clientsList.innerHTML = '<p style="text-align:center; color:#999; padding:20px;">Nessun cliente ancora aggiunto.</p>';
         return;
     }
     
     clients.forEach(client => {
-        // Genera token sicuro per il link cliente
         const clientToken = generateClientToken(client);
         const clientUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}client.html?token=${clientToken}`;
         
@@ -268,11 +268,11 @@ function loadClients() {
                 <p><strong>Password:</strong> ${client.password}</p>
                 <p><strong>Link Gallery:</strong></p>
                 <a href="${clientUrl}" class="client-link" target="_blank">
-                    client.html?token=...
+                    Apri link cliente
                 </a>
                 <div style="background:#e8f4fd; padding:8px; border-radius:4px; margin-top:10px; font-size:12px; word-break:break-all;">
-                    <strong>Link da inviare al cliente:</strong><br>
-                    <code>${clientUrl}</code>
+                    <strong>📋 Link da inviare:</strong><br>
+                    <code style="color:#2980b9;">${clientUrl}</code>
                 </div>
             </div>
             
@@ -288,18 +288,20 @@ function loadClients() {
     });
 }
 
-// NUOVA FUNZIONE: Genera token sicuro per il cliente
+// ============================================
+// FUNZIONI TOKEN CLIENTE
+// ============================================
+
 function generateClientToken(clientData) {
-    const secretKey = 'G&LStudio2026SecretKey12763Mlg@'; // Chiave segreta hardcoded
+    const secretKey = 'G&LStudio2026SecretKey12763Mlg@';
     const payload = {
-        u: clientData.username,    // username
-        p: clientData.password,    // password
-        m: clientData.megaLink,    // mega link
-        i: clientData.id,          // id cliente
-        t: Date.now()              // timestamp per sicurezza
+        u: clientData.username,
+        p: clientData.password,
+        m: clientData.megaLink,
+        i: clientData.id,
+        t: Date.now()
     };
     
-    // XOR semplice + Base64 (offuscamento sufficiente per questo uso)
     const json = JSON.stringify(payload);
     let encrypted = '';
     for (let i = 0; i < json.length; i++) {
@@ -308,16 +310,10 @@ function generateClientToken(clientData) {
     return btoa(encodeURIComponent(encrypted));
 }
 
-// Aggiungi l'evento per il pulsante di aggiornamento
-clientForm.addEventListener('submit', function(e) {
-    if (editingClientId) {
-        updateClient(e);
-    } else {
-        handleAddClient(e);
-    }
-});
+// ============================================
+// FUNZIONI BACKUP
+// ============================================
 
-// Funzioni Backup
 function createBackup() {
     const clients = getClients();
     const backupData = {
@@ -338,7 +334,7 @@ function createBackup() {
     
     URL.revokeObjectURL(url);
     
-    alert('Backup creato con successo! Il file è stato scaricato sul tuo computer.');
+    alert('✅ Backup creato con successo!');
 }
 
 function openRestoreModal() {
@@ -380,29 +376,24 @@ function handleRestore() {
                 return;
             }
             
-            // Chiedi conferma
-            if (!confirm('Attenzione! Questa operazione sovrascriverà tutti i dati attuali. Sei sicuro di voler continuare?')) {
+            if (!confirm('⚠️ Attenzione! Questa operazione sovrascriverà tutti i dati attuali. Continuare?')) {
                 return;
             }
             
-            // Salva i dati
             localStorage.setItem('galleryClients', JSON.stringify(backupData.clients));
             
-            // Mostra successo
             restoreError.textContent = '';
-            restoreSuccess.textContent = 'Backup ripristinato con successo!';
+            restoreSuccess.textContent = '✅ Backup ripristinato con successo!';
             restoreSuccess.style.display = 'block';
             
-            // Aggiorna lista
             loadClients();
             
-            // Chiudi modal dopo 2 secondi
             setTimeout(() => {
                 closeRestoreModal();
             }, 2000);
             
         } catch (error) {
-            restoreError.textContent = 'Errore durante il ripristino del backup: ' + error.message;
+            restoreError.textContent = 'Errore: ' + error.message;
         }
     };
     
@@ -412,6 +403,10 @@ function handleRestore() {
     
     reader.readAsText(file);
 }
+
+// ============================================
+// FUNZIONI DI VISUALIZZAZIONE
+// ============================================
 
 function showDashboard() {
     loginSection.style.display = 'none';
@@ -424,14 +419,6 @@ function showLogin() {
     dashboardSection.style.display = 'none';
 }
 
-function saveLoginStatus() {
-    localStorage.setItem('isAdminLoggedIn', 'true');
-}
-
-function clearLoginStatus() {
-    localStorage.removeItem('isAdminLoggedIn');
-}
-
 function checkLoginStatus() {
     const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
     if (isLoggedIn === 'true') {
@@ -442,33 +429,10 @@ function checkLoginStatus() {
     }
 }
 
-// NUOVA FUNZIONE: Aggiungi pulsante reset sessione
-function addResetButton() {
-    const authBox = document.querySelector('.auth-box');
-    if (authBox) {
-        const resetBtn = document.createElement('button');
-        resetBtn.innerHTML = '🔄 Reset Sessione';
-        resetBtn.style.cssText = `
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 15px;
-            margin-top: 15px;
-            cursor: pointer;
-            font-weight: 600;
-        `;
-        resetBtn.onclick = function() {
-            if (confirm('Resetta la sessione? Questo pulirà tutti i dati temporanei.')) {
-                localStorage.clear();
-                location.reload();
-            }
-        };
-        authBox.appendChild(resetBtn);
-    }
-}
+// ============================================
+// FUNZIONI GLOBALI
+// ============================================
 
-// Rendi le funzioni accessibili globalmente
 window.deleteClient = deleteClient;
 window.editClient = editClient;
 window.openClientDetail = openClientDetail;
@@ -485,3 +449,12 @@ window.onclick = function(event) {
         closeClientDetailModal();
     }
 }
+
+// ============================================
+// DEBUG INIT
+// ============================================
+
+console.log('=== GALLERY MANAGER LOADED ===');
+console.log('Credenziali attese:');
+console.log('Username:', ADMIN_USERNAME);
+console.log('Password:', ADMIN_PASSWORD);
