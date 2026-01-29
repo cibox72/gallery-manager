@@ -96,6 +96,23 @@ body {
     font-weight: 600;
 }
 
+.info-message {
+    background: #e8f4fd;
+    color: #2980b9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: left;
+    border-left: 4px solid #3498db;
+}
+
+.info-message strong {
+    color: #1a5276;
+    display: block;
+    margin-bottom: 8px;
+}
+
 .gallery-section h1 {
     color: #27ae60;
     margin-bottom: 40px;
@@ -116,28 +133,6 @@ body {
 .gallery-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4);
-}
-
-/* Nuovo stile: Messaggio informativo con credenziali */
-.info-message {
-    background: #e8f4fd;
-    color: #2980b9;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    text-align: left;
-    border-left: 4px solid #3498db;
-}
-
-.info-message strong {
-    color: #1a5276;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.info-message br {
-    margin-bottom: 5px;
 }
 
 /* Responsive */
