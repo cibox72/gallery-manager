@@ -65,18 +65,14 @@ function showGallery(megaLink) {
     galleryLink.target = '_blank';
 }
 
-// Funzione per decodificare il token
+// Funzione per decodificare il token - VERSIONE STABILE
 function decodeClientToken(token) {
-    const secretKey = 'G&LStudio2026SecretKey12763Mlg@';
     try {
-        const decoded = decodeURIComponent(atob(token));
-        let decrypted = '';
-        for (let i = 0; i < decoded.length; i++) {
-            decrypted += String.fromCharCode(decoded.charCodeAt(i) ^ secretKey.charCodeAt(i % secretKey.length));
-        }
-        const payload = JSON.parse(decrypted);
+        const decoded = decodeURIComponent(token);
+        const json = atob(decoded);
+        const payload = JSON.parse(json);
         
-        // Verifica timestamp (opzionale: scadenza dopo 1 anno)
+        // Verifica timestamp (scadenza dopo 1 anno)
         const oneYear = 365 * 24 * 60 * 60 * 1000;
         if (Date.now() - payload.t > oneYear) {
             console.warn('Token scaduto');
