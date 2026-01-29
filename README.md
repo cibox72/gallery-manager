@@ -1,25 +1,27 @@
-# Gallery Manager - Sistema di Gestione Gallerie Clienti
+# 🖼️ Gallery Manager
 
-Un'applicazione web completamente offline per gestire gallerie fotografiche dei clienti con accesso protetto.
+Sistema di gestione gallerie fotografiche per clienti con accesso protetto.
 
-## 🚀 Funzionalità
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Deployed-success)](https://tuousername.github.io/gallery-manager/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-- **Dashboard Amministratore**: Accesso protetto con credenziali personali
-- **Gestione Clienti**: Aggiungi, visualizza ed elimina clienti
-- **Gallerie Personalizzate**: Ogni cliente riceve un link unico alla propria galleria
-- **Protezione Accesso**: Ogni galleria è protetta da username e password
-- **Integrazione MEGA**: Link diretti alle gallerie su MEGA
-- **Design Moderno**: Interfaccia elegante e responsive
+## 🌟 Caratteristiche
 
-## 📋 Requisiti
+- ✅ Dashboard amministratore protetta
+- ✅ Gestione completa clienti (CRUD)
+- ✅ Link personalizzati per ogni cliente
+- ✅ Autenticazione a due livelli
+- ✅ Integrazione con MEGA
+- ✅ **Nuovo:** Note per ogni cliente
+- ✅ **Nuovo:** Scheda completa cliente (tasto "Apri")
+- ✅ **Nuovo:** Sistema Backup & Ripristino
+- ✅ Design moderno e responsive
+- ✅ 100% offline (localStorage)
+- ✅ Gratis con GitHub Pages
 
-- Browser moderno con supporto JavaScript
-- Connessione internet per l'accesso a MEGA
-- Account GitHub per l'hosting
-
-## 🛠️ Installazione
+## 🚀 Installazione
 
 1. **Clona il repository**
    ```bash
-   git clone https://github.com/tuo-username/gallery-manager.git
+   git clone https://github.com/tuousername/gallery-manager.git
    cd gallery-manager
