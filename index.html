@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Amministrazione - Gallery Manager</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="loginSection" class="auth-section">
+            <div class="auth-box">
+                <h1>Gallery Manager</h1>
+                <div class="logo-placeholder">LOGO</div>
+                <h2>Accesso Amministratore</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="adminUsername">Nome Utente:</label>
+                        <input type="text" id="adminUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password:</label>
+                        <input type="password" id="adminPassword" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Accedi</button>
+                    <div id="loginError" class="error-message"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="dashboardSection" class="dashboard-section" style="display: none;">
+            <header class="dashboard-header">
+                <div class="logo-container">LOGO</div>
+                <h1>Dashboard Amministrazione</h1>
+                <button id="logoutBtn" class="btn-logout">Logout</button>
+            </header>
+
+            <div class="dashboard-content">
+                <!-- Add Client Form -->
+                <div class="card">
+                    <h2>Aggiungi Nuovo Cliente</h2>
+                    <form id="clientForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientName">Nome Cliente:</label>
+                                <input type="text" id="clientName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientUsername">Username Cliente:</label>
+                                <input type="text" id="clientUsername" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientPassword">Password Cliente:</label>
+                                <input type="password" id="clientPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="megaLink">Link MEGA:</label>
+                                <input type="url" id="megaLink" required placeholder="https://mega.nz/...">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Aggiungi Cliente</button>
+                    </form>
+                </div>
+
+                <!-- Clients List -->
+                <div class="card">
+                    <h2>Lista Clienti</h2>
+                    <div id="clientsList" class="clients-grid">
+                        <!-- Clienti verranno caricati qui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
