@@ -27,7 +27,7 @@ if (!clientToken) {
         // Mostra messaggio informativo
         const infoMsg = document.createElement('div');
         infoMsg.className = 'info-message';
-        infoMsg.style.cssText = 'background:#e8f4fd; color:#2980b9; padding:15px; border-radius:8px; margin-bottom:20px; font-size:14px;';
+        infoMsg.style.cssText = 'background:#e8f4fd; color:#2980b9; padding:15px; border-radius:8px; margin-bottom:20px; font-size:14px; border-left:4px solid #3498db;';
         infoMsg.innerHTML = `
             <strong>ℹ️ Per accedere alla tua galleria:</strong><br>
             Username: <strong>${clientData.u}</strong><br>
@@ -66,7 +66,7 @@ function showGallery(megaLink) {
     galleryLink.target = '_blank';
 }
 
-// NUOVA FUNZIONE: Decodifica token sicuro
+// Funzione per decodificare il token
 function decodeClientToken(token) {
     const secretKey = 'G&LStudio2026SecretKey12763Mlg@';
     try {
@@ -91,7 +91,7 @@ function decodeClientToken(token) {
     }
 }
 
-// Per testing: mostra i dati decodificati nella console
+// Debug console
 if (clientToken && window.clientData) {
     console.log('✅ Cliente caricato correttamente');
     console.log('Username:', window.clientData.u);
