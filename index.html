@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Amministrazione - Gallery Manager</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="icon" href="logo.png" type="image/png">
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="loginSection" class="auth-section">
+            <div class="auth-box">
+                <h1>Gallery Manager</h1>
+                <div class="logo-container">
+                    <img src="logo.png" alt="Logo" id="adminLogo">
+                </div>
+                <h2>Accesso Amministratore</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="adminUsername">Nome Utente:</label>
+                        <input type="text" id="adminUsername" placeholder="gelstudio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password:</label>
+                        <input type="password" id="adminPassword" placeholder="12763Mlg" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Accedi</button>
+                    <div id="loginError" class="error-message"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="dashboardSection" class="dashboard-section" style="display: none;">
+            <header class="dashboard-header">
+                <div class="logo-container">
+                    <img src="logo.png" alt="Logo" id="dashboardLogo">
+                </div>
+                <h1>Dashboard Amministrazione</h1>
+                <div class="header-actions">
+                    <button id="backupBtn" class="btn-backup" title="Crea Backup">
+                        <span>💾 Backup</span>
+                    </button>
+                    <button id="restoreBtn" class="btn-restore" title="Ripristina Backup">
+                        <span>🔄 Ripristina</span>
+                    </button>
+                    <button id="logoutBtn" class="btn-logout">Logout</button>
+                </div>
+            </header>
+
+            <div class="dashboard-content">
+                <!-- Backup Restore Modal -->
+                <div id="restoreModal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Ripristina Backup</h2>
+                            <span class="close-btn" onclick="closeRestoreModal()">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="backupFile">Seleziona file backup (.json):</label>
+                                <input type="file" id="backupFile" accept=".json" required>
+                            </div>
+                            <div id="restoreError" class="error-message"></div>
+                            <div id="restoreSuccess" class="success-message" style="display: none;"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-secondary" onclick="closeRestoreModal()">Annulla</button>
+                            <button class="btn-primary" onclick="handleRestore()">Ripristina</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Detail Modal -->
+                <div id="clientDetailModal" class="modal" style="display: none;">
+                    <div class="modal-content client-detail-modal">
+                        <div class="modal-header">
+                            <h2>Dettagli Cliente</h2>
+                            <span class="close-btn" onclick="closeClientDetailModal()">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <div id="clientDetailContent"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-secondary" onclick="closeClientDetailModal()">Chiudi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Client Form -->
+                <div class="card">
+                    <h2>Aggiungi Nuovo Cliente</h2>
+                    <form id="clientForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientName">Nome Cliente:</label>
+                                <input type="text" id="clientName" placeholder="Mario Rossi" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientUsername">Username Cliente:</label>
+                                <input type="text" id="clientUsername" placeholder="mario.rossi" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientPassword">Password Cliente:</label>
+                                <input type="password" id="clientPassword" placeholder="password123" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="megaLink">Link MEGA:</label>
+                                <input type="url" id="megaLink" placeholder="https://mega.nz/..." required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="clientNotes">Note (opzionale):</label>
+                            <textarea id="clientNotes" rows="3" placeholder="Inserisci note importanti sul cliente..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Aggiungi Cliente</button>
+                    </form>
+                </div>
+
+                <!-- Repair Tools -->
+                <div class="card" style="margin-top: 20px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107;">
+                    <h3 style="margin-top: 0; color: #856404; font-size: 18px;">🛠️ Strumenti di Manutenzione</h3>
+                    <p style="margin-bottom: 15px; color: #856404; font-size: 14px;">
+                        Usa questi strumenti se hai problemi con clienti non validi o dati corrotti
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button type="button" id="repairDataBtn" class="btn-warning" style="background: #ffc107; color: #212529; padding: 10px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: transform 0.2s;">
+                            🛠️ Ripara Dati
+                        </button>
+                        <button type="button" id="deleteIncompleteBtn" class="btn-warning" style="background: #ffc107; color: #212529; padding: 10px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: transform 0.2s;">
+                            🗑️ Elimina Incompleti
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Clients List -->
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2>Lista Clienti <span id="clientsCount">0</span></h2>
+                        <div style="position:relative; width:250px;">
+                            <input type="text" id="clientSearch" placeholder="🔍 Cerca cliente..." style="width:100%; padding:10px; border:2px solid #ddd; border-radius:8px; font-size:14px;">
+                        </div>
+                    </div>
+                    <div id="clientsList" class="clients-grid">
+                        <!-- Clienti verranno caricati qui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
