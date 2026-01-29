@@ -1,8 +1,8 @@
 // ============================================
 // CREDENZIALI DI ACCESSO
 // ============================================
-const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'gelstudio';
+const ADMIN_USERNAME = 'gelstudio';
+const ADMIN_PASSWORD = '12763Mlg';
 
 // ============================================
 // VARIABILI GLOBALI
@@ -69,13 +69,13 @@ function handleLogin(e) {
             errorMsg += `  Attesa: "${ADMIN_PASSWORD}"\n\n`;
         }
         
-        errorMsg += '💡 Username: admin\n💡 Password: gelstudio';
+        errorMsg += '💡 Username: gelstudio\n💡 Password: 12763Mlg';
         
         loginError.textContent = errorMsg;
         
         // Mostra alert per errore evidente
         setTimeout(() => {
-            alert('❌ Accesso negato!\n\nUsername: admin\nPassword: gelstudio');
+            alert('❌ Accesso negato!\n\nUsername: gelstudio\nPassword: 12763Mlg');
         }, 100);
     }
 }
@@ -297,7 +297,10 @@ function loadClients() {
                 </a>
                 <div style="background:#e8f4fd; border-left:4px solid #3498db; padding:12px; border-radius:4px; margin-top:15px; font-size:13px; word-break:break-all;">
                     <strong style="color:#2980b9; display:block; margin-bottom:8px;">📋 Link da inviare al cliente:</strong>
-                    <code style="color:#1a5276; background:#fff; padding:5px; border-radius:3px; display:block; font-family:monospace; font-size:12px;">${clientUrl}</code>
+                    <code style="color:#1a5276; background:#fff; padding:5px; border-radius:3px; display:block; font-family:monospace; font-size:12px; margin-bottom:8px;" id="link-${client.id}">${clientUrl}</code>
+                    <button onclick="copyLink('${client.id}')" style="background:#27ae60; color:white; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-weight:600; width:100%; display:block;">
+                        📋 Copia Link
+                    </button>
                 </div>
             </div>
             
@@ -315,6 +318,29 @@ function loadClients() {
             </div>
         `;
         clientsList.appendChild(clientCard);
+    });
+}
+
+// NUOVA FUNZIONE: Copia link negli appunti
+function copyLink(clientId) {
+    const linkElement = document.getElementById(`link-${clientId}`);
+    const linkText = linkElement.textContent;
+    
+    navigator.clipboard.writeText(linkText).then(() => {
+        // Mostra feedback visivo
+        const originalText = linkElement.nextElementSibling.innerHTML;
+        linkElement.nextElementSibling.innerHTML = '✅ Copiato!';
+        linkElement.nextElementSibling.style.background = '#27ae60';
+        
+        setTimeout(() => {
+            linkElement.nextElementSibling.innerHTML = originalText;
+            linkElement.nextElementSibling.style.background = '';
+        }, 2000);
+        
+        alert('✅ Link copiato negli appunti!\n\nPuoi ora incollarlo e inviarlo al cliente.');
+    }).catch(err => {
+        console.error('Errore durante la copia:', err);
+        alert('❌ Errore durante la copia del link.\n\nSeleziona e copia manualmente il link.');
     });
 }
 
@@ -472,6 +498,7 @@ window.openClientDetail = openClientDetail;
 window.closeClientDetailModal = closeClientDetailModal;
 window.closeRestoreModal = closeRestoreModal;
 window.handleRestore = handleRestore;
+window.copyLink = copyLink;
 
 // Chiudi modals cliccando fuori
 window.onclick = function(event) {
@@ -533,8 +560,8 @@ console.log('║          GALLERY MANAGER - CARICATO CORRETTAMENTE          ║'
 console.log('╚════════════════════════════════════════════════════════════╝');
 console.log('');
 console.log('🔐 Credenziali di accesso:');
-console.log('   Username: admin');
-console.log('   Password: gelstudio');
+console.log('   Username: gelstudio');
+console.log('   Password: 12763Mlg');
 console.log('');
 console.log('💡 Suggerimento: copia e incolla le credenziali esatte.');
 console.log('══════════════════════════════════════════════════════════════');
