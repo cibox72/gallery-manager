@@ -20,11 +20,11 @@
                 <form id="loginForm">
                     <div class="form-group">
                         <label for="adminUsername">Nome Utente:</label>
-                        <input type="text" id="adminUsername" required>
+                        <input type="text" id="adminUsername" placeholder="gelstudio" required>
                     </div>
                     <div class="form-group">
                         <label for="adminPassword">Password:</label>
-                        <input type="password" id="adminPassword" required>
+                        <input type="password" id="adminPassword" placeholder="12763Mlg" required>
                     </div>
                     <button type="submit" class="btn-primary">Accedi</button>
                     <div id="loginError" class="error-message"></div>
@@ -96,22 +96,22 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="clientName">Nome Cliente:</label>
-                                <input type="text" id="clientName" required>
+                                <input type="text" id="clientName" placeholder="Mario Rossi" required>
                             </div>
                             <div class="form-group">
                                 <label for="clientUsername">Username Cliente:</label>
-                                <input type="text" id="clientUsername" required>
+                                <input type="text" id="clientUsername" placeholder="mario.rossi" required>
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="clientPassword">Password Cliente:</label>
-                                <input type="password" id="clientPassword" required>
+                                <input type="password" id="clientPassword" placeholder="password123" required>
                             </div>
                             <div class="form-group">
                                 <label for="megaLink">Link MEGA:</label>
-                                <input type="url" id="megaLink" required placeholder="https://mega.nz/...">
+                                <input type="url" id="megaLink" placeholder="https://mega.nz/..." required>
                             </div>
                         </div>
                         
@@ -121,12 +121,20 @@
                         </div>
                         
                         <button type="submit" class="btn-primary">Aggiungi Cliente</button>
+                        <button type="button" id="resetClientsBtn" class="btn-warning" style="margin-top: 10px; width: 100%;">
+                            🔄 Reset Clienti (pulisci tutti i dati)
+                        </button>
                     </form>
                 </div>
 
                 <!-- Clients List -->
                 <div class="card">
-                    <h2>Lista Clienti</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2>Lista Clienti <span id="clientsCount">0</span></h2>
+                        <div style="position:relative; width:250px;">
+                            <input type="text" id="clientSearch" placeholder="🔍 Cerca cliente..." style="width:100%; padding:10px; border:2px solid #ddd; border-radius:8px; font-size:14px;">
+                        </div>
+                    </div>
                     <div id="clientsList" class="clients-grid">
                         <!-- Clienti verranno caricati qui -->
                     </div>
