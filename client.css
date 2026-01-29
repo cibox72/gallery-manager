@@ -96,6 +96,7 @@ body {
     font-weight: 600;
 }
 
+/* Messaggio informativo con credenziali */
 .info-message {
     background: #e8f4fd;
     color: #2980b9;
@@ -109,8 +110,6 @@ body {
 
 .info-message strong {
     color: #1a5276;
-    display: block;
-    margin-bottom: 8px;
 }
 
 .gallery-section h1 {
