@@ -24,12 +24,11 @@ if (!clientToken) {
         // Salva i dati decodificati per l'autenticazione
         window.clientData = clientData;
         
-        // Mostra messaggio informativo
+        // Mostra messaggio informativo con credenziali
         const infoMsg = document.createElement('div');
         infoMsg.className = 'info-message';
-        infoMsg.style.cssText = 'background:#e8f4fd; color:#2980b9; padding:15px; border-radius:8px; margin-bottom:20px; font-size:14px; border-left:4px solid #3498db;';
         infoMsg.innerHTML = `
-            <strong>ℹ️ Per accedere alla tua galleria:</strong><br>
+            <strong>ℹ️ Credenziali di accesso:</strong><br>
             Username: <strong>${clientData.u}</strong><br>
             Password: <strong>${clientData.p}</strong>
         `;
@@ -89,11 +88,4 @@ function decodeClientToken(token) {
         console.error('Errore decodifica token:', e);
         return null;
     }
-}
-
-// Debug console
-if (clientToken && window.clientData) {
-    console.log('✅ Cliente caricato correttamente');
-    console.log('Username:', window.clientData.u);
-    console.log('Password:', window.clientData.p.substring(0, 3) + '***');
 }
