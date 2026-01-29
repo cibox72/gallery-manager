@@ -375,22 +375,29 @@ function loadClientsFromStorage() {
 }
 
 // ============================================
-// FUNZIONI TOKEN - VERSIONE STABILE
+// FUNZIONI TOKEN - VERSIONE CORRETTA E STABILE
 // ============================================
 
 function getClientUrl(clientId) {
     const client = allClients.find(c => c.id === clientId);
     if (!client) return '#';
     
-    const token = btoa(JSON.stringify({
+    // Crea payload semplice
+    const payload = {
         u: client.username,
         p: client.password,
         m: client.megaLink,
         i: client.id,
         t: Date.now()
-    }));
+    };
     
-    return `${window.location.origin}${window.location.pathname.replace('index.html', '')}client.html?token=${encodeURIComponent(token)}`;
+    // Codifica in Base64 URL-safe
+    const token = btoa(JSON.stringify(payload))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
+    
+    return `${window.location.origin}${window.location.pathname.replace('index.html', '')}client.html?token=${token}`;
 }
 
 function copyLink(clientId) {
@@ -553,5 +560,17 @@ window.onclick = function(event) {
     if (event.target === clientDetailModal) closeClientDetailModal();
 };
 
-console.log('✅ Gallery Manager caricato correttamente');
-console.log('🔐 Credenziali: gelstudio / 12763Mlg');
+// ============================================
+// DEBUG INIT
+// ============================================
+
+console.log('╔════════════════════════════════════════════════════════════╗');
+console.log('║          GALLERY MANAGER - CARICATO CORRETTAMENTE          ║');
+console.log('╚════════════════════════════════════════════════════════════╝');
+console.log('');
+console.log('🔐 Credenziali di accesso:');
+console.log('   Username: gelstudio');
+console.log('   Password: 12763Mlg');
+console.log('');
+console.log('💡 Suggerimento: copia e incolla le credenziali esatte.');
+console.log('══════════════════════════════════════════════════════════════');
