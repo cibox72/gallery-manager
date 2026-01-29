@@ -1,8 +1,8 @@
 // ============================================
 // CREDENZIALI DI ACCESSO
 // ============================================
-const ADMIN_USERNAME = 'G&LStudio';
-const ADMIN_PASSWORD = '12763Mlg@';
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'gelstudio';
 
 // ============================================
 // VARIABILI GLOBALI
@@ -48,48 +48,35 @@ function handleLogin(e) {
     const password = document.getElementById('adminPassword').value.trim();
     const loginError = document.getElementById('loginError');
     
-    // Debug console
-    console.log('=== TENTATIVO DI ACCESSO ===');
-    console.log('Username inserito:', username);
-    console.log('Password inserita:', password.replace(/./g, '*'));
-    console.log('Username atteso:', ADMIN_USERNAME);
-    console.log('Password attesa:', ADMIN_PASSWORD.replace(/./g, '*'));
-    
     // Verifica credenziali
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        console.log('✅ ACCESSO RIUSCITO!');
         isAdminLoggedIn = true;
         localStorage.setItem('isAdminLoggedIn', 'true');
         showDashboard();
         loginError.textContent = '';
     } else {
-        console.log('❌ ACCESSO FALLITO!');
         let errorMsg = '❌ Credenziali errate!\n\n';
         
         if (username !== ADMIN_USERNAME) {
-            console.log('✗ Username errato');
             errorMsg += '• Username non corretto\n';
             errorMsg += `  Inserito: "${username}"\n`;
             errorMsg += `  Atteso: "${ADMIN_USERNAME}"\n\n`;
         }
         
         if (password !== ADMIN_PASSWORD) {
-            console.log('✗ Password errata');
             errorMsg += '• Password non corretta\n';
-            errorMsg += `  Inserita: "${password.replace(/./g, '*')}"\n`;
-            errorMsg += `  Attesa: "${ADMIN_PASSWORD.replace(/./g, '*')}"\n\n`;
+            errorMsg += `  Inserita: "${password}"\n`;
+            errorMsg += `  Attesa: "${ADMIN_PASSWORD}"\n\n`;
         }
         
-        errorMsg += '💡 Suggerimento: copia e incolla le credenziali esatte.';
+        errorMsg += '💡 Username: admin\n💡 Password: gelstudio';
         
         loginError.textContent = errorMsg;
         
         // Mostra alert per errore evidente
-        if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
-            setTimeout(() => {
-                alert('❌ Accesso negato!\n\nControlla username e password.\n\nUsername: G&LStudio\nPassword: 12763Mlg@');
-            }, 100);
-        }
+        setTimeout(() => {
+            alert('❌ Accesso negato!\n\nUsername: admin\nPassword: gelstudio');
+        }, 100);
     }
 }
 
@@ -497,21 +484,6 @@ window.onclick = function(event) {
 }
 
 // ============================================
-// DEBUG INIT
-// ============================================
-
-console.log('╔════════════════════════════════════════════════════════════╗');
-console.log('║          GALLERY MANAGER - CARICATO CORRETTAMENTE          ║');
-console.log('╚════════════════════════════════════════════════════════════╝');
-console.log('');
-console.log('🔐 Credenziali di accesso:');
-console.log('   Username: ' + ADMIN_USERNAME);
-console.log('   Password: ' + ADMIN_PASSWORD);
-console.log('');
-console.log('💡 Suggerimento: copia e incolla le credenziali esatte.');
-console.log('══════════════════════════════════════════════════════════════');
-
-// ============================================
 // AGGIUNGI PULSANTE RESET NELLA PAGINA DI LOGIN
 // ============================================
 
@@ -551,3 +523,18 @@ window.addEventListener('DOMContentLoaded', function() {
         authBox.appendChild(resetBtn);
     }
 });
+
+// ============================================
+// DEBUG INIT
+// ============================================
+
+console.log('╔════════════════════════════════════════════════════════════╗');
+console.log('║          GALLERY MANAGER - CARICATO CORRETTAMENTE          ║');
+console.log('╚════════════════════════════════════════════════════════════╝');
+console.log('');
+console.log('🔐 Credenziali di accesso:');
+console.log('   Username: admin');
+console.log('   Password: gelstudio');
+console.log('');
+console.log('💡 Suggerimento: copia e incolla le credenziali esatte.');
+console.log('══════════════════════════════════════════════════════════════');
