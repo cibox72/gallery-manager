@@ -9,7 +9,7 @@ const ADMIN_PASSWORD = '12763Mlg';
 // ============================================
 let isAdminLoggedIn = false;
 let editingClientId = null;
-let allClients = []; // Cache dei clienti per performance
+let allClients = [];
 
 // ============================================
 // ELEMENTI DOM
@@ -26,8 +26,6 @@ const restoreModal = document.getElementById('restoreModal');
 const clientDetailModal = document.getElementById('clientDetailModal');
 const clientsCountEl = document.getElementById('clientsCount');
 const searchInput = document.getElementById('clientSearch');
-const repairDataBtn = document.getElementById('repairDataBtn');
-const deleteIncompleteBtn = document.getElementById('deleteIncompleteBtn');
 
 // ============================================
 // EVENT LISTENERS
@@ -38,8 +36,6 @@ clientForm.addEventListener('submit', handleClientForm);
 backupBtn.addEventListener('click', createBackup);
 restoreBtn.addEventListener('click', openRestoreModal);
 if (searchInput) searchInput.addEventListener('input', filterClients);
-if (repairDataBtn) repairDataBtn.addEventListener('click', repairClientsData);
-if (deleteIncompleteBtn) deleteIncompleteBtn.addEventListener('click', deleteIncompleteClients);
 
 // Carica dashboard se già loggato
 checkLoginStatus();
@@ -72,7 +68,7 @@ function handleLogout() {
 }
 
 // ============================================
-// FUNZIONI DI GESTIONE CLIENTI - OTTIMIZZATE
+// FUNZIONI DI GESTIONE CLIENTI
 // ============================================
 
 function handleClientForm(e) {
@@ -92,7 +88,6 @@ function addClient() {
         return;
     }
     
-    // ID univoco semplice e veloce
     const clientId = 'client_' + Date.now() + '_' + Math.floor(Math.random() * 900000 + 100000);
     
     const newClient = {
@@ -105,11 +100,9 @@ function addClient() {
         createdAt: Date.now()
     };
     
-    // Aggiungi alla cache e salva
     allClients.push(newClient);
     saveClientsToStorage();
     
-    // Reset form e aggiorna lista
     clientForm.reset();
     document.getElementById('clientNotes').value = '';
     loadClients();
@@ -156,41 +149,33 @@ function updateClient() {
 
 function deleteClient(clientId) {
     if (!clientId || clientId.trim() === '') {
-        alert('❌ ID cliente non valido!\n\nIl cliente non può essere eliminato.');
+        alert('❌ ID cliente non valido!');
         return;
     }
     
-    try {
+    const clientBefore = allClients.find(c => c.id === clientId);
+    if (!clientBefore) {
+        alert('❌ Cliente non trovato!');
+        return;
+    }
+    
+    const clientInfo = [
+        clientBefore.name ? `Nome: ${clientBefore.name}` : 'Nome: N/D',
+        clientBefore.username ? `Username: ${clientBefore.username}` : 'Username: N/D',
+        clientBefore.password ? `Password: ${clientBefore.password}` : 'Password: N/D'
+    ].join('\n');
+    
+    if (confirm(`⚠️ Eliminare questo cliente?\n\n${clientInfo}\n\nQuesta azione non può essere annullata!`)) {
         const initialCount = allClients.length;
-        const clientBefore = allClients.find(c => c.id === clientId);
+        allClients = allClients.filter(client => client.id !== clientId);
         
-        if (!clientBefore) {
-            alert('❌ Cliente non trovato!\n\nIl cliente potrebbe essere stato già eliminato.');
-            return;
+        if (allClients.length < initialCount) {
+            saveClientsToStorage();
+            loadClients();
+            alert('✅ Cliente eliminato con successo!');
+        } else {
+            alert('❌ Errore durante l\'eliminazione!');
         }
-        
-        // Mostra informazioni del cliente per conferma
-        const clientInfo = [
-            clientBefore.name ? `Nome: ${clientBefore.name}` : 'Nome: N/D',
-            clientBefore.username ? `Username: ${clientBefore.username}` : 'Username: N/D',
-            clientBefore.password ? `Password: ${clientBefore.password}` : 'Password: N/D',
-            clientBefore.megaLink ? `Link: ${clientBefore.megaLink.substring(0, 50)}...` : 'Link: N/D'
-        ].join('\n');
-        
-        if (confirm(`⚠️ Sei sicuro di voler eliminare questo cliente?\n\n${clientInfo}\n\nQuesta azione non può essere annullata!`)) {
-            allClients = allClients.filter(client => client.id !== clientId);
-            
-            if (allClients.length < initialCount) {
-                saveClientsToStorage();
-                loadClients();
-                alert('✅ Cliente eliminato con successo!');
-            } else {
-                alert('❌ Errore durante l\'eliminazione!\n\nIl cliente non è stato eliminato.');
-            }
-        }
-    } catch (error) {
-        console.error('❌ Errore durante l\'eliminazione:', error);
-        alert('❌ Si è verificato un errore!\n\nDettagli: ' + error.message);
     }
 }
 
@@ -211,16 +196,14 @@ function editClient(clientId) {
 }
 
 // ============================================
-// FUNZIONI DI VISUALIZZAZIONE - OTTIMIZZATE
+// FUNZIONI DI VISUALIZZAZIONE
 // ============================================
 
 function loadClients() {
-    // Aggiorna contatore
     if (clientsCountEl) {
         clientsCountEl.textContent = allClients.length;
     }
     
-    // Filtra clienti se c'è una ricerca
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
     const filteredClients = searchTerm 
         ? allClients.filter(c => 
@@ -230,10 +213,7 @@ function loadClients() {
           )
         : allClients;
     
-    // Ordina per data (più recenti prima)
     filteredClients.sort((a, b) => b.createdAt - a.createdAt);
-    
-    // Renderizza SOLO i primi 50 clienti per performance
     const clientsToRender = filteredClients.slice(0, 50);
     const totalCount = filteredClients.length;
     
@@ -250,7 +230,6 @@ function loadClients() {
         return;
     }
     
-    // Messaggio se ci sono più di 50 clienti
     if (totalCount > 50) {
         const warning = document.createElement('div');
         warning.style.cssText = 'background:#fff3cd; color:#856404; padding:12px; border-radius:8px; margin-bottom:15px; text-align:center; font-weight:500;';
@@ -258,7 +237,6 @@ function loadClients() {
         clientsList.appendChild(warning);
     }
     
-    // Renderizza clienti
     clientsToRender.forEach(client => {
         const clientCard = document.createElement('div');
         clientCard.className = 'client-card';
@@ -296,7 +274,7 @@ function loadClients() {
 }
 
 function filterClients() {
-    loadClients(); // Ricarica con filtro
+    loadClients();
 }
 
 function openClientDetail(clientId) {
@@ -370,27 +348,15 @@ function closeClientDetailModal() {
 }
 
 // ============================================
-// FUNZIONI DI SALVATAGGIO - OTTIMIZZATE
+// FUNZIONI DI SALVATAGGIO
 // ============================================
 
 function saveClientsToStorage() {
     try {
-        // Comprimi i dati per risparmiare spazio
-        const compressed = allClients.map(c => ({
-            i: c.id,
-            n: c.name,
-            u: c.username,
-            p: c.password,
-            m: c.megaLink,
-            t: c.notes,
-            c: c.createdAt
-        }));
-        
-        localStorage.setItem('galleryClients', JSON.stringify(compressed));
-        console.log(`✅ Salvati ${allClients.length} clienti - ${Math.round(JSON.stringify(compressed).length / 1024)} KB`);
+        localStorage.setItem('galleryClients', JSON.stringify(allClients));
     } catch (error) {
         if (error.name === 'QuotaExceededError') {
-            alert(`❌ Spazio esaurito nel browser!\n\nHai troppi clienti (${allClients.length}).\n\nSOLUZIONE:\n1. Fai un backup\n2. Elimina alcuni clienti\n3. Usa un browser diverso`);
+            alert(`❌ Spazio esaurito nel browser!\n\nHai troppi clienti (${allClients.length}).\n\nSOLUZIONE:\n1. Fai un backup\n2. Elimina alcuni clienti`);
         } else {
             alert(`❌ Errore durante il salvataggio:\n${error.message}`);
         }
@@ -400,53 +366,31 @@ function saveClientsToStorage() {
 function loadClientsFromStorage() {
     try {
         const data = localStorage.getItem('galleryClients');
-        if (!data) {
-            allClients = [];
-            return;
-        }
-        
-        const compressed = JSON.parse(data);
-        // Decomprimi i dati
-        allClients = compressed.map(c => ({
-            id: c.i,
-            name: c.n,
-            username: c.u,
-            password: c.p,
-            megaLink: c.m,
-            notes: c.t || '',
-            createdAt: c.c
-        }));
-        
-        console.log(`✅ Caricati ${allClients.length} clienti`);
+        allClients = data ? JSON.parse(data) : [];
     } catch (error) {
         console.error('❌ Errore caricamento clienti:', error);
         allClients = [];
-        alert('❌ Errore durante il caricamento dei clienti!\n\nI dati potrebbero essere danneggiati. Considera di ripristinare un backup.');
+        alert('❌ Errore durante il caricamento dei clienti!');
     }
 }
 
 // ============================================
-// FUNZIONI TOKEN - OTTIMIZZATE (GENERAZIONE SU RICHIESTA)
+// FUNZIONI TOKEN - VERSIONE STABILE
 // ============================================
 
 function getClientUrl(clientId) {
-    try {
-        const client = allClients.find(c => c.id === clientId);
-        if (!client) return '#';
-        
-        // Genera token SOLO quando necessario
-        const token = generateClientToken({
-            username: client.username,
-            password: client.password,
-            megaLink: client.megaLink,
-            id: client.id
-        });
-        
-        return `${window.location.origin}${window.location.pathname.replace('index.html', '')}client.html?token=${token}`;
-    } catch (error) {
-        console.error('Errore generazione URL:', error);
-        return '#';
-    }
+    const client = allClients.find(c => c.id === clientId);
+    if (!client) return '#';
+    
+    const token = btoa(JSON.stringify({
+        u: client.username,
+        p: client.password,
+        m: client.megaLink,
+        i: client.id,
+        t: Date.now()
+    }));
+    
+    return `${window.location.origin}${window.location.pathname.replace('index.html', '')}client.html?token=${encodeURIComponent(token)}`;
 }
 
 function copyLink(clientId) {
@@ -456,9 +400,8 @@ function copyLink(clientId) {
 
 function copyText(text) {
     navigator.clipboard.writeText(text).then(() => {
-        alert('✅ Link copiato negli appunti!\n\nPuoi ora inviarlo al cliente.');
+        alert('✅ Link copiato negli appunti!');
     }).catch(err => {
-        // Fallback per browser che non supportano clipboard API
         const tempInput = document.createElement('input');
         tempInput.value = text;
         document.body.appendChild(tempInput);
@@ -467,29 +410,6 @@ function copyText(text) {
         document.body.removeChild(tempInput);
         alert('✅ Link copiato (metodo alternativo)!');
     });
-}
-
-function generateClientToken(clientData) {
-    const secretKey = 'G&LStudio2026SecretKey12763Mlg@';
-    const payload = {
-        u: clientData.username,
-        p: clientData.password,
-        m: clientData.megaLink,
-        i: clientData.id,
-        t: Date.now()
-    };
-    
-    try {
-        const json = JSON.stringify(payload);
-        let encrypted = '';
-        for (let i = 0; i < json.length; i++) {
-            encrypted += String.fromCharCode(json.charCodeAt(i) ^ secretKey.charCodeAt(i % secretKey.length));
-        }
-        return btoa(encodeURIComponent(encrypted));
-    } catch (error) {
-        console.error('Errore generazione token:', error);
-        throw new Error('Impossibile generare il token di accesso');
-    }
 }
 
 // ============================================
@@ -501,15 +421,7 @@ function createBackup() {
         const backupData = {
             version: '3.0',
             timestamp: new Date().toISOString(),
-            clients: allClients.map(c => ({
-                id: c.id,
-                name: c.name,
-                username: c.username,
-                password: c.password,
-                megaLink: c.megaLink,
-                notes: c.notes,
-                createdAt: c.createdAt
-            }))
+            clients: allClients
         };
         
         const backupString = JSON.stringify(backupData, null, 2);
@@ -566,17 +478,7 @@ function handleRestore() {
                 return;
             }
             
-            // Ricostruisci i clienti nel formato corrente
-            allClients = backupData.clients.map(c => ({
-                id: c.id || ('client_' + Date.now() + '_' + Math.floor(Math.random() * 900000 + 100000)),
-                name: c.name,
-                username: c.username,
-                password: c.password,
-                megaLink: c.megaLink,
-                notes: c.notes || '',
-                createdAt: c.createdAt || Date.now()
-            }));
-            
+            allClients = backupData.clients;
             saveClientsToStorage();
             loadClients();
             
@@ -598,89 +500,6 @@ function handleRestore() {
 }
 
 // ============================================
-// FUNZIONI DI RIPARAZIONE DATI
-// ============================================
-
-function repairClientsData() {
-    try {
-        let clients = allClients;
-        const validClients = [];
-        let invalidCount = 0;
-        
-        clients.forEach(client => {
-            // Mantieni solo clienti con ID valido
-            if (client.id && client.id.trim() !== '') {
-                validClients.push(client);
-            } else {
-                invalidCount++;
-                console.warn('Cliente con ID non valido rimosso:', client);
-            }
-        });
-        
-        if (invalidCount > 0) {
-            allClients = validClients;
-            saveClientsToStorage();
-            loadClients();
-            alert(`✅ Dati riparati!\n\n${invalidCount} clienti non validi eliminati.`);
-        } else {
-            alert('✅ Nessun problema rilevato!\n\nTutti i clienti sono validi.');
-        }
-    } catch (error) {
-        console.error('❌ Errore durante la riparazione dei dati:', error);
-        alert('❌ Si è verificato un errore!\n\nDettagli: ' + error.message);
-    }
-}
-
-function deleteIncompleteClients() {
-    try {
-        const initialCount = allClients.length;
-        
-        // Trova clienti senza dati essenziali
-        const incompleteClients = allClients.filter(c => 
-            !c.name || 
-            !c.username || 
-            !c.password || 
-            !c.megaLink
-        );
-        
-        if (incompleteClients.length === 0) {
-            alert('✅ Nessun cliente incompleto trovato!');
-            return;
-        }
-        
-        // Mostra informazioni sui clienti da eliminare
-        let message = `⚠️ Trovati ${incompleteClients.length} clienti incompleti:\n\n`;
-        incompleteClients.forEach((client, index) => {
-            message += `${index + 1}. ${client.name || 'Nome non definito'}\n`;
-            message += `   Username: ${client.username || 'N/D'}\n`;
-            message += `   Password: ${client.password || 'N/D'}\n\n`;
-        });
-        
-        message += 'Sei sicuro di voler eliminare tutti i clienti incompleti?';
-        
-        if (confirm(message)) {
-            allClients = allClients.filter(c => 
-                c.name && 
-                c.username && 
-                c.password && 
-                c.megaLink
-            );
-            
-            if (allClients.length < initialCount) {
-                saveClientsToStorage();
-                loadClients();
-                alert(`✅ ${incompleteClients.length} clienti incompleti eliminati con successo!`);
-            } else {
-                alert('❌ Errore durante l\'eliminazione!');
-            }
-        }
-    } catch (error) {
-        console.error('❌ Errore durante l\'eliminazione clienti incompleti:', error);
-        alert('❌ Si è verificato un errore!\n\nDettagli: ' + error.message);
-    }
-}
-
-// ============================================
 // FUNZIONI DI SUPPORTO
 // ============================================
 
@@ -697,8 +516,8 @@ function escapeHtml(text) {
 function showDashboard() {
     loginSection.style.display = 'none';
     dashboardSection.style.display = 'block';
-    loadClientsFromStorage(); // Carica i clienti dalla memoria
-    loadClients(); // Renderizza la lista
+    loadClientsFromStorage();
+    loadClients();
 }
 
 function showLogin() {
@@ -729,23 +548,10 @@ window.handleRestore = handleRestore;
 window.copyLink = copyLink;
 window.copyText = copyText;
 
-// Chiudi modals cliccando fuori
 window.onclick = function(event) {
     if (event.target === restoreModal) closeRestoreModal();
     if (event.target === clientDetailModal) closeClientDetailModal();
 };
 
-// ============================================
-// INIZIALIZZAZIONE
-// ============================================
-
-console.log('╔════════════════════════════════════════════════════════════╗');
-console.log('║       GALLERY MANAGER - VERSIONE PER MOLTI CLIENTI         ║');
-console.log('║              Ottimizzato per 100+ clienti                  ║');
-console.log('╚════════════════════════════════════════════════════════════╝');
+console.log('✅ Gallery Manager caricato correttamente');
 console.log('🔐 Credenziali: gelstudio / 12763Mlg');
-console.log('💡 Consigli:');
-console.log('   • Usa la ricerca per trovare clienti velocemente');
-console.log('   • Fai backup regolari (max 500 clienti)');
-console.log('   • Elimina clienti vecchi se superi i 300');
-console.log('══════════════════════════════════════════════════════════════');
