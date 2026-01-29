@@ -118,6 +118,28 @@ body {
     box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4);
 }
 
+/* Nuovo stile: Messaggio informativo con credenziali */
+.info-message {
+    background: #e8f4fd;
+    color: #2980b9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: left;
+    border-left: 4px solid #3498db;
+}
+
+.info-message strong {
+    color: #1a5276;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.info-message br {
+    margin-bottom: 5px;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
     .auth-container {
@@ -131,5 +153,15 @@ body {
     
     .login-section h1, .gallery-section h1 {
         font-size: 24px;
+    }
+    
+    .gallery-btn {
+        padding: 16px 20px;
+        font-size: 18px;
+    }
+    
+    .info-message {
+        font-size: 13px;
+        padding: 12px;
     }
 }
