@@ -43,12 +43,10 @@ checkLoginStatus();
 function handleLogin(e) {
     e.preventDefault();
     
-    // Rimuovi spazi prima/dopo
     const username = document.getElementById('adminUsername').value.trim();
     const password = document.getElementById('adminPassword').value.trim();
     const loginError = document.getElementById('loginError');
     
-    // Verifica credenziali
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
         isAdminLoggedIn = true;
         localStorage.setItem('isAdminLoggedIn', 'true');
@@ -59,21 +57,15 @@ function handleLogin(e) {
         
         if (username !== ADMIN_USERNAME) {
             errorMsg += '• Username non corretto\n';
-            errorMsg += `  Inserito: "${username}"\n`;
-            errorMsg += `  Atteso: "${ADMIN_USERNAME}"\n\n`;
         }
         
         if (password !== ADMIN_PASSWORD) {
             errorMsg += '• Password non corretta\n';
-            errorMsg += `  Inserita: "${password}"\n`;
-            errorMsg += `  Attesa: "${ADMIN_PASSWORD}"\n\n`;
         }
         
-        errorMsg += '💡 Username: gelstudio\n💡 Password: 12763Mlg';
-        
+        errorMsg += '\n💡 Username: gelstudio\n💡 Password: 12763Mlg';
         loginError.textContent = errorMsg;
         
-        // Mostra alert per errore evidente
         setTimeout(() => {
             alert('❌ Accesso negato!\n\nUsername: gelstudio\nPassword: 12763Mlg');
         }, 100);
@@ -101,163 +93,229 @@ function handleClientForm(e) {
 }
 
 function addClient() {
-    const clientName = document.getElementById('clientName').value;
-    const clientUsername = document.getElementById('clientUsername').value;
-    const clientPassword = document.getElementById('clientPassword').value;
-    const megaLink = document.getElementById('megaLink').value;
-    const clientNotes = document.getElementById('clientNotes').value;
-    
-    const clientId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-    
-    const newClient = {
-        id: clientId,
-        name: clientName,
-        username: clientUsername,
-        password: clientPassword,
-        megaLink: megaLink,
-        notes: clientNotes,
-        createdAt: new Date().toISOString()
-    };
-    
-    let clients = getClients();
-    clients.push(newClient);
-    localStorage.setItem('galleryClients', JSON.stringify(clients));
-    
-    clientForm.reset();
-    document.getElementById('clientNotes').value = '';
-    loadClients();
-    
-    alert('✅ Cliente aggiunto con successo!');
-}
-
-function updateClient() {
-    const clientName = document.getElementById('clientName').value;
-    const clientUsername = document.getElementById('clientUsername').value;
-    const clientPassword = document.getElementById('clientPassword').value;
-    const megaLink = document.getElementById('megaLink').value;
-    const clientNotes = document.getElementById('clientNotes').value;
-    
-    let clients = getClients();
-    const index = clients.findIndex(client => client.id === editingClientId);
-    
-    if (index !== -1) {
-        clients[index] = {
-            ...clients[index],
+    try {
+        const clientName = document.getElementById('clientName').value.trim();
+        const clientUsername = document.getElementById('clientUsername').value.trim();
+        const clientPassword = document.getElementById('clientPassword').value.trim();
+        const megaLink = document.getElementById('megaLink').value.trim();
+        const clientNotes = document.getElementById('clientNotes').value.trim();
+        
+        // Validazione dati
+        if (!clientName || !clientUsername || !clientPassword || !megaLink) {
+            alert('⚠️ Tutti i campi obbligatori devono essere compilati!');
+            return;
+        }
+        
+        const clientId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+        
+        const newClient = {
+            id: clientId,
             name: clientName,
             username: clientUsername,
             password: clientPassword,
             megaLink: megaLink,
-            notes: clientNotes
+            notes: clientNotes,
+            createdAt: new Date().toISOString()
         };
         
-        localStorage.setItem('galleryClients', JSON.stringify(clients));
-        editingClientId = null;
+        console.log('✅ Aggiungendo cliente:', newClient);
         
-        clientForm.querySelector('button[type="submit"]').textContent = 'Aggiungi Cliente';
+        let clients = getClients();
+        clients.push(newClient);
+        
+        // Salva nel localStorage con try-catch
+        try {
+            localStorage.setItem('galleryClients', JSON.stringify(clients));
+            console.log('✅ Cliente salvato nel localStorage');
+        } catch (error) {
+            console.error('❌ Errore salvataggio localStorage:', error);
+            alert('❌ Errore durante il salvataggio!\n\nIl localStorage potrebbe essere pieno.\n\nProva a fare un backup e ripulire i dati.');
+            return;
+        }
+        
         clientForm.reset();
         document.getElementById('clientNotes').value = '';
-        
         loadClients();
-        alert('✅ Cliente aggiornato con successo!');
+        
+        alert('✅ Cliente aggiunto con successo!');
+    } catch (error) {
+        console.error('❌ Errore durante l\'aggiunta del cliente:', error);
+        alert('❌ Si è verificato un errore!\n\nDettagli: ' + error.message);
+    }
+}
+
+function updateClient() {
+    try {
+        const clientName = document.getElementById('clientName').value.trim();
+        const clientUsername = document.getElementById('clientUsername').value.trim();
+        const clientPassword = document.getElementById('clientPassword').value.trim();
+        const megaLink = document.getElementById('megaLink').value.trim();
+        const clientNotes = document.getElementById('clientNotes').value.trim();
+        
+        if (!clientName || !clientUsername || !clientPassword || !megaLink) {
+            alert('⚠️ Tutti i campi obbligatori devono essere compilati!');
+            return;
+        }
+        
+        let clients = getClients();
+        const index = clients.findIndex(client => client.id === editingClientId);
+        
+        if (index !== -1) {
+            clients[index] = {
+                ...clients[index],
+                name: clientName,
+                username: clientUsername,
+                password: clientPassword,
+                megaLink: megaLink,
+                notes: clientNotes
+            };
+            
+            localStorage.setItem('galleryClients', JSON.stringify(clients));
+            editingClientId = null;
+            
+            clientForm.querySelector('button[type="submit"]').textContent = 'Aggiungi Cliente';
+            clientForm.reset();
+            document.getElementById('clientNotes').value = '';
+            
+            loadClients();
+            alert('✅ Cliente aggiornato con successo!');
+        } else {
+            alert('❌ Cliente non trovato!');
+        }
+    } catch (error) {
+        console.error('❌ Errore durante l\'aggiornamento:', error);
+        alert('❌ Si è verificato un errore!\n\nDettagli: ' + error.message);
     }
 }
 
 function getClients() {
-    const clients = localStorage.getItem('galleryClients');
-    return clients ? JSON.parse(clients) : [];
+    try {
+        const clients = localStorage.getItem('galleryClients');
+        const parsed = clients ? JSON.parse(clients) : [];
+        console.log('📊 Clienti caricati:', parsed.length);
+        return parsed;
+    } catch (error) {
+        console.error('❌ Errore caricamento clienti:', error);
+        alert('❌ Errore durante il caricamento dei clienti!\n\nIl localStorage potrebbe essere danneggiato.');
+        return [];
+    }
 }
 
 function deleteClient(clientId) {
     if (confirm('⚠️ Sei sicuro di voler eliminare questo cliente?\n\nQuesta azione non può essere annullata!')) {
-        let clients = getClients();
-        clients = clients.filter(client => client.id !== clientId);
-        localStorage.setItem('galleryClients', JSON.stringify(clients));
-        loadClients();
-        alert('✅ Cliente eliminato con successo!');
+        try {
+            let clients = getClients();
+            const initialCount = clients.length;
+            clients = clients.filter(client => client.id !== clientId);
+            localStorage.setItem('galleryClients', JSON.stringify(clients));
+            
+            if (clients.length === initialCount - 1) {
+                loadClients();
+                alert('✅ Cliente eliminato con successo!');
+            } else {
+                alert('❌ Cliente non trovato!');
+            }
+        } catch (error) {
+            console.error('❌ Errore durante l\'eliminazione:', error);
+            alert('❌ Si è verificato un errore!\n\nDettagli: ' + error.message);
+        }
     }
 }
 
 function editClient(clientId) {
-    editingClientId = clientId;
-    
-    const clients = getClients();
-    const client = clients.find(c => c.id === clientId);
-    
-    if (client) {
-        document.getElementById('clientName').value = client.name;
-        document.getElementById('clientUsername').value = client.username;
-        document.getElementById('clientPassword').value = client.password;
-        document.getElementById('megaLink').value = client.megaLink;
-        document.getElementById('clientNotes').value = client.notes || '';
+    try {
+        editingClientId = clientId;
+        const clients = getClients();
+        const client = clients.find(c => c.id === clientId);
         
-        clientForm.querySelector('button[type="submit"]').textContent = 'Aggiorna Cliente';
+        if (client) {
+            document.getElementById('clientName').value = client.name;
+            document.getElementById('clientUsername').value = client.username;
+            document.getElementById('clientPassword').value = client.password;
+            document.getElementById('megaLink').value = client.megaLink;
+            document.getElementById('clientNotes').value = client.notes || '';
+            
+            clientForm.querySelector('button[type="submit"]').textContent = 'Aggiorna Cliente';
+        } else {
+            alert('❌ Cliente non trovato!');
+        }
+    } catch (error) {
+        console.error('❌ Errore durante la modifica:', error);
+        alert('❌ Si è verificato un errore!\n\nDettagli: ' + error.message);
     }
 }
 
 function openClientDetail(clientId) {
-    const clients = getClients();
-    const client = clients.find(c => c.id === clientId);
-    
-    if (client) {
-        const detailContent = document.getElementById('clientDetailContent');
-        const createdAt = new Date(client.createdAt).toLocaleString('it-IT', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+    try {
+        const clients = getClients();
+        const client = clients.find(c => c.id === clientId);
         
-        detailContent.innerHTML = `
-            <div class="client-detail-info">
-                <div class="detail-item">
-                    <span class="detail-label">👤 Nome Cliente:</span>
-                    <div class="detail-value">${client.name}</div>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">🔑 Username:</span>
-                    <div class="detail-value">${client.username}</div>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">🔒 Password:</span>
-                    <div class="detail-value">${client.password}</div>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">🔗 Link MEGA:</span>
-                    <div class="detail-value">
-                        <a href="${client.megaLink}" target="_blank" style="color: #667eea; text-decoration: underline;">
-                            ${client.megaLink.length > 50 ? client.megaLink.substring(0, 50) + '...' : client.megaLink}
-                        </a>
+        if (client) {
+            const detailContent = document.getElementById('clientDetailContent');
+            const createdAt = new Date(client.createdAt).toLocaleString('it-IT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            detailContent.innerHTML = `
+                <div class="client-detail-info">
+                    <div class="detail-item">
+                        <span class="detail-label">👤 Nome Cliente:</span>
+                        <div class="detail-value">${escapeHtml(client.name)}</div>
                     </div>
-                </div>
-                <div class="detail-item full-width">
-                    <span class="detail-label">🌐 Link Galleria Cliente:</span>
-                    <div class="detail-value">
-                        <a href="client.html?token=${generateClientToken(client)}" target="_blank" style="color: #667eea; text-decoration: underline;">
-                            Apri link cliente
-                        </a>
-                        <div style="margin-top:8px; font-size:12px; color:#666;">
-                            client.html?token=...
+                    <div class="detail-item">
+                        <span class="detail-label">🔑 Username:</span>
+                        <div class="detail-value">${escapeHtml(client.username)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">🔒 Password:</span>
+                        <div class="detail-value">${escapeHtml(client.password)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">🔗 Link MEGA:</span>
+                        <div class="detail-value">
+                            <a href="${escapeHtml(client.megaLink)}" target="_blank" style="color: #667eea; text-decoration: underline;">
+                                ${client.megaLink.length > 50 ? client.megaLink.substring(0, 50) + '...' : client.megaLink}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="detail-item full-width">
+                        <span class="detail-label">🌐 Link Galleria Cliente:</span>
+                        <div class="detail-value">
+                            <a href="client.html?token=${generateClientToken(client)}" target="_blank" style="color: #667eea; text-decoration: underline;">
+                                Apri link cliente
+                            </a>
+                            <div style="margin-top:8px; font-size:12px; color:#666;">
+                                client.html?token=...
+                            </div>
+                        </div>
+                    </div>
+                    ${client.notes ? `
+                    <div class="detail-item full-width">
+                        <span class="detail-label">📝 Note:</span>
+                        <div class="detail-value">${escapeHtml(client.notes).replace(/\n/g, '<br>')}</div>
+                    </div>
+                    ` : ''}
+                    <div class="detail-item full-width">
+                        <span class="detail-label">📅 Data Creazione:</span>
+                        <div class="detail-value">${createdAt}</div>
+                        <div class="created-date" style="font-size:12px; color:#999; margin-top:5px;">
+                            ID Cliente: ${client.id}
                         </div>
                     </div>
                 </div>
-                ${client.notes ? `
-                <div class="detail-item full-width">
-                    <span class="detail-label">📝 Note:</span>
-                    <div class="detail-value">${client.notes.replace(/\n/g, '<br>')}</div>
-                </div>
-                ` : ''}
-                <div class="detail-item full-width">
-                    <span class="detail-label">📅 Data Creazione:</span>
-                    <div class="detail-value">${createdAt}</div>
-                    <div class="created-date" style="font-size:12px; color:#999; margin-top:5px;">
-                        ID Cliente: ${client.id}
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        clientDetailModal.style.display = 'block';
+            `;
+            
+            clientDetailModal.style.display = 'block';
+        } else {
+            alert('❌ Cliente non trovato!');
+        }
+    } catch (error) {
+        console.error('❌ Errore durante l\'apertura dei dettagli:', error);
+        alert('❌ Si è verificato un errore!\n\nDettagli: ' + error.message);
     }
 }
 
@@ -266,82 +324,122 @@ function closeClientDetailModal() {
 }
 
 function loadClients() {
-    const clients = getClients();
-    clientsList.innerHTML = '';
-    
-    if (clients.length === 0) {
-        clientsList.innerHTML = `
-            <div style="text-align:center; padding:40px; color:#999;">
-                <div style="font-size:48px; margin-bottom:20px;">📭</div>
-                <p style="font-size:18px; margin-bottom:10px;">Nessun cliente ancora aggiunto</p>
-                <p style="font-size:14px;">Clicca su "Aggiungi Nuovo Cliente" per iniziare</p>
-            </div>
-        `;
-        return;
-    }
-    
-    clients.forEach(client => {
-        const clientToken = generateClientToken(client);
-        const clientUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}client.html?token=${clientToken}`;
+    try {
+        const clients = getClients();
+        clientsList.innerHTML = '';
         
-        const clientCard = document.createElement('div');
-        clientCard.className = 'client-card';
-        clientCard.innerHTML = `
-            <h3>${client.name}</h3>
-            <div class="client-info">
-                <p><strong>👤 Username:</strong> ${client.username}</p>
-                <p><strong>🔒 Password:</strong> ${client.password}</p>
-                <p><strong>🔗 Link Gallery:</strong></p>
-                <a href="${clientUrl}" class="client-link" target="_blank">
-                    🌐 Apri link cliente
-                </a>
-                <div style="background:#e8f4fd; border-left:4px solid #3498db; padding:12px; border-radius:4px; margin-top:15px; font-size:13px; word-break:break-all;">
-                    <strong style="color:#2980b9; display:block; margin-bottom:8px;">📋 Link da inviare al cliente:</strong>
-                    <code style="color:#1a5276; background:#fff; padding:5px; border-radius:3px; display:block; font-family:monospace; font-size:12px; margin-bottom:8px;" id="link-${client.id}">${clientUrl}</code>
-                    <button onclick="copyLink('${client.id}')" style="background:#27ae60; color:white; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-weight:600; width:100%; display:block;">
-                        📋 Copia Link
-                    </button>
+        console.log('📋 Caricando lista clienti...');
+        
+        if (clients.length === 0) {
+            clientsList.innerHTML = `
+                <div style="text-align:center; padding:40px; color:#999;">
+                    <div style="font-size:48px; margin-bottom:20px;">📭</div>
+                    <p style="font-size:18px; margin-bottom:10px;">Nessun cliente ancora aggiunto</p>
+                    <p style="font-size:14px;">Clicca su "Aggiungi Nuovo Cliente" per iniziare</p>
                 </div>
-            </div>
-            
-            ${client.notes ? `
-            <div class="client-notes">
-                <strong style="color:#856404; display:block; margin-bottom:5px;">📝 Note:</strong>
-                <p>${client.notes}</p>
-            </div>
-            ` : ''}
-            
-            <div class="button-group">
-                <button class="open-btn" onclick="openClientDetail('${client.id}')">📁 Apri</button>
-                <button class="edit-btn" onclick="editClient('${client.id}')">✏️ Modifica</button>
-                <button class="delete-btn" onclick="deleteClient('${client.id}')">🗑️ Elimina</button>
+            `;
+            console.log('📭 Nessun cliente trovato');
+            return;
+        }
+        
+        console.log(`✅ Trovati ${clients.length} clienti`);
+        
+        clients.forEach(client => {
+            try {
+                const clientToken = generateClientToken(client);
+                const clientUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}client.html?token=${clientToken}`;
+                
+                const clientCard = document.createElement('div');
+                clientCard.className = 'client-card';
+                clientCard.innerHTML = `
+                    <h3>${escapeHtml(client.name)}</h3>
+                    <div class="client-info">
+                        <p><strong>👤 Username:</strong> ${escapeHtml(client.username)}</p>
+                        <p><strong>🔒 Password:</strong> ${escapeHtml(client.password)}</p>
+                        <p><strong>🔗 Link Gallery:</strong></p>
+                        <a href="${clientUrl}" class="client-link" target="_blank">
+                            🌐 Apri link cliente
+                        </a>
+                        <div style="background:#e8f4fd; border-left:4px solid #3498db; padding:12px; border-radius:4px; margin-top:15px; font-size:13px; word-break:break-all;">
+                            <strong style="color:#2980b9; display:block; margin-bottom:8px;">📋 Link da inviare al cliente:</strong>
+                            <code style="color:#1a5276; background:#fff; padding:5px; border-radius:3px; display:block; font-family:monospace; font-size:12px; margin-bottom:8px;" id="link-${client.id}">${clientUrl}</code>
+                            <button onclick="copyLink('${client.id}')" style="background:#27ae60; color:white; border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-weight:600; width:100%; display:block;">
+                                📋 Copia Link
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${client.notes ? `
+                    <div class="client-notes">
+                        <strong style="color:#856404; display:block; margin-bottom:5px;">📝 Note:</strong>
+                        <p>${escapeHtml(client.notes)}</p>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="button-group">
+                        <button class="open-btn" onclick="openClientDetail('${client.id}')">📁 Apri</button>
+                        <button class="edit-btn" onclick="editClient('${client.id}')">✏️ Modifica</button>
+                        <button class="delete-btn" onclick="deleteClient('${client.id}')">🗑️ Elimina</button>
+                    </div>
+                `;
+                clientsList.appendChild(clientCard);
+            } catch (error) {
+                console.error(`❌ Errore durante il rendering del cliente ${client.id}:`, error);
+            }
+        });
+        
+        console.log('✅ Lista clienti caricata con successo');
+    } catch (error) {
+        console.error('❌ Errore durante il caricamento della lista:', error);
+        clientsList.innerHTML = `
+            <div style="text-align:center; padding:40px; color:#e74c3c;">
+                <div style="font-size:48px; margin-bottom:20px;">❌</div>
+                <p style="font-size:18px; margin-bottom:10px;">Errore durante il caricamento dei clienti</p>
+                <p style="font-size:14px; margin-bottom:20px;">Controlla la console per i dettagli</p>
+                <button onclick="loadClients()" style="background:#667eea; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">
+                    Riprova
+                </button>
             </div>
         `;
-        clientsList.appendChild(clientCard);
-    });
+    }
+}
+
+// Funzione per escape HTML (sicurezza)
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 // NUOVA FUNZIONE: Copia link negli appunti
 function copyLink(clientId) {
-    const linkElement = document.getElementById(`link-${clientId}`);
-    const linkText = linkElement.textContent;
-    
-    navigator.clipboard.writeText(linkText).then(() => {
-        // Mostra feedback visivo
-        const originalText = linkElement.nextElementSibling.innerHTML;
-        linkElement.nextElementSibling.innerHTML = '✅ Copiato!';
-        linkElement.nextElementSibling.style.background = '#27ae60';
+    try {
+        const linkElement = document.getElementById(`link-${clientId}`);
+        const linkText = linkElement.textContent;
         
-        setTimeout(() => {
-            linkElement.nextElementSibling.innerHTML = originalText;
-            linkElement.nextElementSibling.style.background = '';
-        }, 2000);
-        
-        alert('✅ Link copiato negli appunti!\n\nPuoi ora incollarlo e inviarlo al cliente.');
-    }).catch(err => {
-        console.error('Errore durante la copia:', err);
-        alert('❌ Errore durante la copia del link.\n\nSeleziona e copia manualmente il link.');
-    });
+        navigator.clipboard.writeText(linkText).then(() => {
+            const originalText = linkElement.nextElementSibling.innerHTML;
+            linkElement.nextElementSibling.innerHTML = '✅ Copiato!';
+            linkElement.nextElementSibling.style.background = '#27ae60';
+            
+            setTimeout(() => {
+                linkElement.nextElementSibling.innerHTML = originalText;
+                linkElement.nextElementSibling.style.background = '';
+            }, 2000);
+            
+            console.log('✅ Link copiato:', linkText);
+        }).catch(err => {
+            console.error('❌ Errore durante la copia:', err);
+            alert('❌ Impossibile copiare il link.\n\nSeleziona e copia manualmente.');
+        });
+    } catch (error) {
+        console.error('❌ Errore nella funzione copyLink:', error);
+        alert('❌ Si è verificato un errore!');
+    }
 }
 
 // ============================================
@@ -371,27 +469,32 @@ function generateClientToken(clientData) {
 // ============================================
 
 function createBackup() {
-    const clients = getClients();
-    const backupData = {
-        version: '2.0',
-        timestamp: new Date().toISOString(),
-        clients: clients
-    };
-    
-    const backupString = JSON.stringify(backupData, null, 2);
-    const blob = new Blob([backupString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    const timestamp = new Date().toLocaleDateString('it-IT').replace(/\//g, '-') + '_' + 
-                      new Date().toLocaleTimeString('it-IT').replace(/:/g, '-');
-    a.href = url;
-    a.download = `gallery-backup-${timestamp}.json`;
-    a.click();
-    
-    URL.revokeObjectURL(url);
-    
-    alert('✅ Backup creato con successo!\n\nIl file è stato scaricato sul tuo computer.');
+    try {
+        const clients = getClients();
+        const backupData = {
+            version: '2.0',
+            timestamp: new Date().toISOString(),
+            clients: clients
+        };
+        
+        const backupString = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([backupString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        const timestamp = new Date().toLocaleDateString('it-IT').replace(/\//g, '-') + '_' + 
+                          new Date().toLocaleTimeString('it-IT').replace(/:/g, '-');
+        a.href = url;
+        a.download = `gallery-backup-${timestamp}.json`;
+        a.click();
+        
+        URL.revokeObjectURL(url);
+        
+        alert(`✅ Backup creato con successo!\n\n${clients.length} clienti salvati.`);
+    } catch (error) {
+        console.error('❌ Errore durante il backup:', error);
+        alert('❌ Errore durante la creazione del backup!\n\nDettagli: ' + error.message);
+    }
 }
 
 function openRestoreModal() {
